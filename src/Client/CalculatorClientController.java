@@ -26,7 +26,7 @@ public class CalculatorClientController {
 
     public void communicate(CalculatorView theView){
 
-        theView.addCalculateListener(e ->{
+        theView.addAddListener(e ->{
             int firstNumber = 0;
             int secondNumber = 0;
             String line = "";
@@ -35,7 +35,31 @@ public class CalculatorClientController {
                 firstNumber = theView.getFirstNumber(); // send to server
                 secondNumber = theView.getSecondNumber(); // send to server
 
-                line += firstNumber + "," + secondNumber;
+                line += firstNumber + ",+," + secondNumber;
+                socketOut.println(line); // sending data to server
+
+                // Reading result from server
+                int solution = Integer.parseInt(socketIn.readLine());
+
+                theView.setTheSolution(solution);
+            }
+            catch (IOException e1){
+                e1.printStackTrace();
+            }catch(NumberFormatException ex){
+                theView.displayErrorMessage("Error! You must enter a number!");
+            }
+        });
+
+        theView.addSubtractListener(e->{
+            int firstNumber = 0;
+            int secondNumber = 0;
+            String line = "";
+            try {
+                // We are reading data from the view
+                firstNumber = theView.getFirstNumber(); // send to server
+                secondNumber = theView.getSecondNumber(); // send to server
+
+                line += firstNumber + ",-," + secondNumber;
                 socketOut.println(line); // sending data to server
 
                 // Reading result from server

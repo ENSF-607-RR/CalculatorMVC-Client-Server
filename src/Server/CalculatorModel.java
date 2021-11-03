@@ -28,6 +28,10 @@ public class CalculatorModel implements Runnable{
         result = a + b;
     }
 
+    public void subtractTwoNumbers(int a, int b){
+        result = a - b;
+    }
+
     public int getResult() {
         return result;
     }
@@ -39,14 +43,21 @@ public class CalculatorModel implements Runnable{
         String response = null;
         int a;
         int b;
+        String op;
         while(true){
             try {
                 line = socketIn.readLine();
                 if(line != null){
                     buffer = line.split(",");
                     a = Integer.parseInt(buffer[0]);
-                    b = Integer.parseInt(buffer[1]);
-                    addTwoNumber(a, b);
+                    op = buffer[1];
+                    b = Integer.parseInt(buffer[2]);
+
+                    switch (op) {
+                        case "+" -> addTwoNumber(a, b);
+                        case "-" -> subtractTwoNumbers(a, b);
+                    }
+
                     response = Integer.toString(getResult());
                     socketOut.println(response);
                     socketOut.flush();
