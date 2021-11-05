@@ -1,22 +1,14 @@
 package Server;
 
-import Client.CalculatorView;
-import Server.CalculatorModel;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * This ties the view and model together
+ * This class is responsible for establishing connections with the client
+ * and running the Calculator application
  */
 public class CalculatorServerController {
 
@@ -24,6 +16,7 @@ public class CalculatorServerController {
     private ServerSocket serverSocket;
     private Socket clientSocket;
     private ExecutorService pool;
+    private CalculatorController theController;
 
     public CalculatorServerController(int portNumber){
         try {
@@ -36,18 +29,22 @@ public class CalculatorServerController {
     }
 
     public void runServer(){
-        while(true){
-            try{
+
+        try{
+            while(true) {
                 // accept clients request
                 clientSocket = serverSocket.accept();
 
-                theModel = new CalculatorModel(clientSocket);
-                pool.execute(theModel);
-            }catch(IOException e){
-                e.printStackTrace();
+                theModel = new CalculatorModel();
+                theController = new CalculatorController(theModel, clientSocket);
+                // run the application on a thread
+                pool.execute(theController);
             }
-
+        }catch(IOException e){
+            e.printStackTrace();
         }
+        // close the thread pool
+        pool.shutdown();
     }
 
     public static void main(String[] args){
